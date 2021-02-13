@@ -14,7 +14,8 @@ public:
     };
 public:
     explicit SideBarContainer(QWidget *parent = nullptr);
-    QAction *addAction(const QString &text, const QIcon &icon = QIcon());
+    QAction *addAction(const QString &text, const QIcon &icon = QIcon() , bool popupMenuEnabled = false);
+    QAction *addMenuAction(const QString &text, QAction *action , const QIcon &icon = QIcon());
     QSize minimumSizeHint() const;
     void setContainerOrientation(SideBarContainer::ContainerOrientaion orientation);
 
@@ -35,6 +36,8 @@ private:
   QAction *mOverAction;
 
   SideBarContainer::ContainerOrientaion m_cOrientation;
+
+  QMap<QAction* , QMenu*> actMenuMap;
 };
 
 #endif // SIDEBARCONTAINER_H

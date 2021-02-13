@@ -9,15 +9,20 @@ MainWidget::MainWidget(QWidget *parent)
     ui->setupUi(this);
 
     sidebarLeft = new Sidebar(this);
-    auto map = sidebarLeft->addAction("Map" ,QIcon(":/Images/Images/maps.png"));
-    connect(map,&QAction::triggered , this , [](bool ){
-        qDebug() << "Map Selected";
+    auto map = sidebarLeft->addAction("Map" ,QIcon(":/Images/Images/maps.png") , true);
+    sidebarLeft->addMenuAction(map , "Configuration");
+
+    connect(map,&QAction::triggered , this , [](bool){
+            qDebug() << "Map Selected";
     });
-    auto ppi = sidebarLeft->addAction("PPI" ,QIcon(":/Images/Images/ppi.png"));
-    connect(ppi,&QAction::triggered , this , [](bool ){
-        qDebug() << "PPI Selected";
+    auto ppi = sidebarLeft->addAction("PPI" ,QIcon(":/Images/Images/ppi.png") , true);
+    connect(ppi,&QAction::triggered , this , [](bool){
+            qDebug() << "PPI Selected";
     });
-    ui->horizontalLayout->addWidget(sidebarLeft);
+
+    sidebarLeft->addMenuAction(ppi , "Settings");
+
+    ui->verticalLayout->addWidget(sidebarLeft);
 
 //    sidebarRight = new Sidebar(this);
 //    sidebarRight->setSideBarDirection(Sidebar::Left);

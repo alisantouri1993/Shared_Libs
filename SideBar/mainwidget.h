@@ -21,8 +21,8 @@ protected:
 private:
     Ui::MainWidget *ui;
     Sidebar* sidebarLeft;
-    Sidebar* sidebarRight;
-    Sidebar* sidebarTop;
-    Sidebar* sidebarBottom;
+//    Sidebar* sidebarRight;
+//    Sidebar* sidebarTop;
+//    Sidebar* sidebarBottom;
 };
 #endif // MAINWIDGET_H

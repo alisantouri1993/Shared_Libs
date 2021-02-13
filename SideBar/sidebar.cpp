@@ -114,15 +114,20 @@ void Sidebar::configLayout()
 //    sidebarContainer->addAction("PPI_2" ,QIcon(":/Images/Images/ppi.png"));
 }
 
-void Sidebar::repaintAllWidgets()
+void Sidebar::repaintNeeded()
 {
     sidebarContainer->repaint();
     update();
 }
 
-QAction *Sidebar::addAction(const QString &text, const QIcon &icon)
+QAction *Sidebar::addAction(const QString &text, const QIcon &icon, bool popupMenuEnabled)
 {
-    return sidebarContainer->addAction(text ,icon);
+    return sidebarContainer->addAction(text ,icon ,popupMenuEnabled);
+}
+
+QAction *Sidebar::addMenuAction(QAction *action  ,const QString &text ,const QIcon &icon)
+{
+    return sidebarContainer->addMenuAction(text , action ,icon);
 }
 
 void Sidebar::resizeEvent(QResizeEvent *event)
@@ -178,7 +183,6 @@ void Sidebar::on_upExpandBut_clicked(bool checked)
       ui->upExpandBut->setArrowType(Qt::UpArrow);
     }
 }
-
 
 void Sidebar::on_downExpandBut_clicked(bool checked)
 {

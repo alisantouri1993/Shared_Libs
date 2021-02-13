@@ -33,7 +33,8 @@ private:
 public :
     void setSideBarDirection(Sidebar::Direction dir);
     void repaintNeeded();
-    QAction * addAction(const QString &text, const QIcon &icon = QIcon());
+    QAction * addAction(const QString &text, const QIcon &icon = QIcon() , bool popupMenuEnabled = false);
+    QAction * addMenuAction(QAction *action  ,const QString &text , const QIcon &icon = QIcon());
 
 protected:
     void resizeEvent(QResizeEvent *event);

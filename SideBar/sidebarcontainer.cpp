@@ -4,6 +4,7 @@
 #include <QEvent>
 #include <QPaintEvent>
 #include <QPainter>
+#include <QMenu>
 
 #define action_height 90
 #define action_width  80
@@ -61,7 +62,7 @@ void SideBarContainer::paintEvent(QPaintEvent *event) {
     QRect actionIconRect = rect();
     if(m_cOrientation == Vertical)
     {
-    actionIconRect = QRect(0, action_y + 10, actionRect.width(),
+        actionIconRect = QRect(0, action_y + 10, actionRect.width(),
                          actionRect.height() - 2 * actionTextRect.height() -
                              10);
     }
@@ -99,7 +100,7 @@ void SideBarContainer::setContainerOrientation(SideBarContainer::ContainerOrient
 //  update();
 //}
 
-QAction *SideBarContainer::addAction(const QString &text, const QIcon &icon) {
+QAction *SideBarContainer::addAction(const QString &text, const QIcon &icon, bool popupMenuEnabled) {
   QAction *action = new QAction(icon, text, this);
   action->setCheckable(true);
   mActions.push_back(action);
@@ -109,8 +110,22 @@ QAction *SideBarContainer::addAction(const QString &text, const QIcon &icon) {
   else
     setMaximumWidth(action_width * mActions.size() + (container_margin/3) * (mActions.size() - 1) + container_margin );
 
+  if(popupMenuEnabled)
+  {
+      QMenu *menu = new QMenu(this);
+      actMenuMap.insert(action , menu);
+  }
+
   update();
   return action;
+}
+
+QAction *SideBarContainer::addMenuAction(const QString &text, QAction *action, const QIcon &icon)
+{
+    if(actMenuMap.find(action) != actMenuMap.end())
+        return actMenuMap[action]->addAction(icon ,text);
+    else
+        return nullptr;
 }
 
 void SideBarContainer::mousePressEvent(QMouseEvent *event) {
@@ -118,14 +133,28 @@ void SideBarContainer::mousePressEvent(QMouseEvent *event) {
   if (tempAction == nullptr || tempAction->isChecked())
     return;
 
-  emit tempAction->triggered();
+  if(event->button() == Qt::LeftButton)
+  {
+    if (mCheckedAction)
+      mCheckedAction->setChecked(false);
+    if (mOverAction == tempAction)
+      mOverAction = nullptr;
+    mCheckedAction = tempAction;
+    tempAction->setChecked(true);
 
-  if (mCheckedAction)
-    mCheckedAction->setChecked(false);
-  if (mOverAction == tempAction)
-    mOverAction = nullptr;
-  mCheckedAction = tempAction;
-  tempAction->setChecked(true);
+    emit tempAction->triggered();
+  }
+
+  else //Rigth Buuton
+  {
+    if(actMenuMap.find(tempAction) != actMenuMap.end())
+    {
+        QPoint mousePos = QCursor::pos();
+        actMenuMap[tempAction]->popup(QPoint(mousePos.x() , mousePos.y() + 30));
+    }
+  }
+  //emit tempAction->triggered();
+
   update();
   QWidget::mousePressEvent(event);
 }
