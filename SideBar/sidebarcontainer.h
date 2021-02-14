@@ -12,10 +12,16 @@ public:
          Vertical ,
          Horizontal
     };
+
+    enum Selection {
+        Single ,
+        Multiple
+    };
 public:
     explicit SideBarContainer(QWidget *parent = nullptr);
     QAction *addAction(const QString &text, const QIcon &icon = QIcon() , bool popupMenuEnabled = false);
     QAction *addMenuAction(const QString &text, QAction *action , const QIcon &icon = QIcon());
+    void setSideBarSelection(SideBarContainer::Selection select);
     QSize minimumSizeHint() const;
     void setContainerOrientation(SideBarContainer::ContainerOrientaion orientation);
 
@@ -36,6 +42,7 @@ private:
   QAction *mOverAction;
 
   SideBarContainer::ContainerOrientaion m_cOrientation;
+  SideBarContainer::Selection m_select;
 
   QMap<QAction* , QMenu*> actMenuMap;
 };

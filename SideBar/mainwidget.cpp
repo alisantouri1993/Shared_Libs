@@ -22,6 +22,8 @@ MainWidget::MainWidget(QWidget *parent)
 
     sidebarLeft->addMenuAction(ppi , "Settings");
 
+    sidebarLeft->setSideBarSelection(SideBarContainer::Multiple);
+
     ui->verticalLayout->addWidget(sidebarLeft);
 
 //    sidebarRight = new Sidebar(this);

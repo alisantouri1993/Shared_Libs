@@ -66,6 +66,11 @@ void Sidebar::setSideBarDirection(Sidebar::Direction dir)
     configLayout();
 }
 
+void Sidebar::setSideBarSelection(SideBarContainer::Selection select)
+{
+    sidebarContainer->setSideBarSelection(select);
+}
+
 void Sidebar::configLayout()
 {
     switch (m_dir) {

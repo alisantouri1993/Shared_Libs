@@ -24,6 +24,7 @@ public:
          Up   ,
          Down
         };
+
 private:
     //void initAnimation();
     void initObjects();
@@ -32,6 +33,7 @@ private:
 
 public :
     void setSideBarDirection(Sidebar::Direction dir);
+    void setSideBarSelection(SideBarContainer::Selection select);
     void repaintNeeded();
     QAction * addAction(const QString &text, const QIcon &icon = QIcon() , bool popupMenuEnabled = false);
     QAction * addMenuAction(QAction *action  ,const QString &text , const QIcon &icon = QIcon());

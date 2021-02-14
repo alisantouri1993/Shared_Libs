@@ -10,7 +10,7 @@
 #define action_width  80
 #define container_margin 30
 
-SideBarContainer::SideBarContainer(QWidget *parent) : QWidget(parent) , mCheckedAction(nullptr), mOverAction(nullptr) , m_cOrientation(Vertical)
+SideBarContainer::SideBarContainer(QWidget *parent) : QWidget(parent) , mCheckedAction(nullptr), mOverAction(nullptr) , m_cOrientation(Vertical) , m_select(Single)
 {
     setMouseTracking(true);
 }
@@ -20,10 +20,12 @@ void SideBarContainer::paintEvent(QPaintEvent *event) {
 
   QFont fontText(p.font());
   fontText.setFamily("Helvetica Neue");
+  fontText.setPointSize(7);
   p.setFont(fontText);
 
   int action_x = container_margin/2;
   int action_y = container_margin/2;
+  int action_index = 0;
   p.fillRect(rect(), QColor(100, 100, 100));
   for (auto action : mActions) {
 
@@ -52,7 +54,8 @@ void SideBarContainer::paintEvent(QPaintEvent *event) {
     }
     else
     {
-        int action_index = action_x/actionRect.width();
+        //int action_index = action_x/actionRect.width();
+        //qDebug() <<action_index;
         actionTextRect = QRect(QPoint((container_margin/2 + (container_margin/3 * action_index) + (action_index * actionRect.width() + actionRect.width() / 2))- size.width() / 2,
                                 actionRect.bottom() - size.height() - 5),
                                  size);
@@ -76,17 +79,19 @@ void SideBarContainer::paintEvent(QPaintEvent *event) {
     actionIcon.paint(&p, actionIconRect);
 
     if(m_cOrientation == Vertical)
-        action_y += actionRect.height();
+        action_y += actionRect.height() + container_margin/3;
     else
         action_x += actionRect.width() + container_margin/3;
+    action_index++;
   }
 }
 
 QSize SideBarContainer::minimumSizeHint() const {
     if (m_cOrientation == Vertical)
-        return (action_height + 15) * QSize(1, mActions.size());
+        return QSize(action_height + (container_margin)/2 ,(action_height + container_margin) * (mActions.size()) );
+        //return (action_height + 30) * QSize(1, mActions.size());
     else
-        return (action_width + 15) * QSize(mActions.size(), 1);
+        return (action_width + (container_margin)/2) * QSize(mActions.size(), 1);
 }
 
 void SideBarContainer::setContainerOrientation(SideBarContainer::ContainerOrientaion orientation)
@@ -106,7 +111,7 @@ QAction *SideBarContainer::addAction(const QString &text, const QIcon &icon, boo
   mActions.push_back(action);
 
   if(m_cOrientation == Vertical)
-    setMaximumHeight(action_height * mActions.size() + container_margin );
+    setMaximumHeight(action_height * mActions.size() +  container_margin + (container_margin/3) * (mActions.size() - 1) );
   else
     setMaximumWidth(action_width * mActions.size() + (container_margin/3) * (mActions.size() - 1) + container_margin );
 
@@ -128,32 +133,48 @@ QAction *SideBarContainer::addMenuAction(const QString &text, QAction *action, c
         return nullptr;
 }
 
+void SideBarContainer::setSideBarSelection(SideBarContainer::Selection select)
+{
+    m_select = select;
+}
+
 void SideBarContainer::mousePressEvent(QMouseEvent *event) {
   QAction *tempAction = actionAt(event->pos());
-  if (tempAction == nullptr || tempAction->isChecked())
-    return;
 
-  if(event->button() == Qt::LeftButton)
+  if(event->button() == Qt::RightButton)
   {
-    if (mCheckedAction)
-      mCheckedAction->setChecked(false);
-    if (mOverAction == tempAction)
-      mOverAction = nullptr;
-    mCheckedAction = tempAction;
-    tempAction->setChecked(true);
-
-    emit tempAction->triggered();
+      if(actMenuMap.find(tempAction) != actMenuMap.end())
+      {
+          QPoint mousePos = QCursor::pos();
+          actMenuMap[tempAction]->popup(QPoint(mousePos.x() , mousePos.y() + 30));
+      }
   }
-
-  else //Rigth Buuton
+  else
   {
-    if(actMenuMap.find(tempAction) != actMenuMap.end())
-    {
-        QPoint mousePos = QCursor::pos();
-        actMenuMap[tempAction]->popup(QPoint(mousePos.x() , mousePos.y() + 30));
-    }
+      if (tempAction == nullptr)
+          return;
+
+      if(m_select == SideBarContainer::Single && tempAction->isChecked())
+          return;
+
+      if(m_select == SideBarContainer::Single)
+      {
+          if (mCheckedAction)
+              mCheckedAction->setChecked(false);
+          if (mOverAction == tempAction)
+              mOverAction = nullptr;
+          mCheckedAction = tempAction;
+          tempAction->setChecked(true);
+      }
+
+      else
+      {
+          if (mOverAction == tempAction)
+              mOverAction = nullptr;
+          tempAction->setChecked(!tempAction->isChecked());
+      }
+      emit tempAction->triggered(tempAction->isChecked());
   }
-  //emit tempAction->triggered();
 
   update();
   QWidget::mousePressEvent(event);
@@ -192,9 +213,9 @@ QAction *SideBarContainer::actionAt(const QPoint &at) {
       return action;
 
     if(m_cOrientation == Vertical)
-        cont_margin += actionRect.height();
+        cont_margin += actionRect.height() + container_margin/3;
     else
-        cont_margin += actionRect.width();
+        cont_margin += actionRect.width() + container_margin/3;
   }
   return nullptr;
 }
