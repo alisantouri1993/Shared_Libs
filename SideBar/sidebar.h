@@ -4,25 +4,30 @@
 #include <QWidget>
 #include <QPropertyAnimation>
 #include <QGraphicsEffect>
+#include <QGridLayout>
+#include <QPainter>
+#include <QPaintEvent>
 #include "sidebarcontainer.h"
 
 namespace Ui {
 class Sidebar;
 }
 
+class SidebarLabel;
+
 class Sidebar : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit Sidebar(QWidget *parent = nullptr);
+    explicit Sidebar(QWidget *parent = nullptr ,const QString &title = "");
     ~Sidebar();
 
     enum Direction {
-         Right ,
-         Left  ,
-         Up   ,
-         Down
+         RightToLeft ,
+         LeftToRight  ,
+         UpToDown   ,
+         DownToUp
         };
 
 private:
@@ -54,6 +59,29 @@ private:
     QPropertyAnimation *animation;
 
     Sidebar::Direction m_dir;
+
+    SidebarLabel * sidebarLabel;
+    QString m_title = "";
+};
+
+
+class SidebarLabel : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit SidebarLabel(QWidget *parent = nullptr , SideBarContainer::ContainerOrientaion orientation = SideBarContainer::Vertical);
+    ~SidebarLabel() = default;
+public:
+    void setSidebarLabelOrientation(SideBarContainer::ContainerOrientaion orientation);
+    void setSidebarLabelTitle(const QString &title);
+    QSize minimumSizeHint() const;
+protected:
+  void paintEvent(QPaintEvent *event);
+private:
+  QString m_title = "";
+  QGridLayout * layout;
+  SideBarContainer::ContainerOrientaion m_orientation;
+
 };
 
 #endif // SIDEBAR_H
