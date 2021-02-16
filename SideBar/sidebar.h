@@ -75,12 +75,17 @@ public:
     void setSidebarLabelOrientation(SideBarContainer::ContainerOrientaion orientation);
     void setSidebarLabelTitle(const QString &title);
     QSize minimumSizeHint() const;
+signals:
+    void sidebarPositionChanged(const QPoint &newPos);
 protected:
   void paintEvent(QPaintEvent *event);
+  void mousePressEvent(QMouseEvent *event);
+  void mouseMoveEvent(QMouseEvent *event);
 private:
   QString m_title = "";
   QGridLayout * layout;
   SideBarContainer::ContainerOrientaion m_orientation;
+  QPoint sidebarCurrentPos;
 
 };
 

@@ -11,9 +11,9 @@ Sidebar::Sidebar(QWidget *parent, const QString &title) :
     ui->setupUi(this);
     initObjects();
     //initAnimation();
+    configLayout();
     connectObjects();
 
-    configLayout();
 }
 
 Sidebar::~Sidebar()
@@ -49,6 +49,19 @@ void Sidebar::initObjects()
 
 void Sidebar::connectObjects()
 {
+    connect(sidebarLabel , &SidebarLabel::sidebarPositionChanged , this ,[this](const QPoint &newPoint){
+
+        if(m_dir == Sidebar::LeftToRight || m_dir == Sidebar::RightToLeft)
+        {
+            int currentX = this->pos().x();
+            this->move(currentX , mapToParent(newPoint).y());
+        }
+        else
+        {
+            int currentY = this->pos().y();
+            this->move(mapToParent(newPoint).x() ,currentY );
+        }
+    });
 }
 
 void Sidebar::setSideBarDirection(Sidebar::Direction dir)
@@ -213,6 +226,7 @@ SidebarLabel::SidebarLabel(QWidget *parent , SideBarContainer::ContainerOrientai
     layout = new QGridLayout(this);
     layout->setContentsMargins( 0 , 0 , 0 , 0);
     layout->setSpacing(0);
+    setMouseTracking(true);
 }
 
 void SidebarLabel::setSidebarLabelOrientation(SideBarContainer::ContainerOrientaion orientation)
@@ -263,5 +277,30 @@ void SidebarLabel::paintEvent(QPaintEvent *event)
     }
     else
         p.drawText(event->rect(), Qt::AlignCenter, m_title);
+
+}
+
+void SidebarLabel::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+       sidebarCurrentPos = event->pos();
+       // offset = mapToParent(event->pos());
+    }
+}
+
+void SidebarLabel::mouseMoveEvent(QMouseEvent *event)
+{
+    this->setCursor(Qt::OpenHandCursor);
+
+    if(event->buttons() & Qt::LeftButton)
+    {
+        QPoint diffPos = event->pos() - sidebarCurrentPos;
+//        if(m_orientation == SideBarContainer::ContainerOrientaion::Vertical
+//                 && ((diffPos.x() <= -2 || diffPos.x() >= 2)))
+//            return;
+        //parentWidget()->parentWidget()->move(mapToParent(event->pos()) - sidebarCurrentPos);
+        emit sidebarPositionChanged(diffPos);
+    }
 
 }

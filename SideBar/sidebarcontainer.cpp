@@ -6,8 +6,8 @@
 #include <QPainter>
 #include <QMenu>
 
-#define action_height 90
-#define action_width  80
+#define action_height 60
+#define action_width  50
 #define container_margin 30
 
 SideBarContainer::SideBarContainer(QWidget *parent) : QWidget(parent) , mCheckedAction(nullptr), mOverAction(nullptr) , m_cOrientation(Vertical) , m_select(Single)
